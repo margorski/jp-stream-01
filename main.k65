@@ -1,61 +1,110 @@
 
-var screen = 0x9000;
-var frame;
+var   frame;
+var   sprites  =   0x7000;
+var   sprites_h = 	0x7400;
+var   screen   =   0x9000;
 
-data fonts { address 0x5000 
-			 image "data/font" 0 0 8> 8v		tiles 8 0 31 
-			 image "data/font" 0 8 8> 8v		tiles 8 0 31 
-			 image "data/font" 0 16 8> 8v		tiles 8 0 31 
-			 image "data/font" 0 24 8> 8v		tiles 8 0 31 }
+data   fonts   {   address   0x5000
+			   image   "data/font"   0   0   8>   8v		tiles   8   0   31   
+			   image   "data/font"   0   8   8>   8v		tiles   8   0   31   
+			   image   "data/font"   0   16   8>   8v		tiles   8   0   31   
+			   image   "data/font"   0   24   8>   8v		tiles   8   0   31   }
 
-data displist {
+data   map1   {	
+	61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   92  0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   92  0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   0  60   0   0   0   60  0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 61  61  61  61  61  61  61  61  61  0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   125 0   0   125 0   0   0   93
+	93  0   0   0   0   0   0   0   0   60  0   0   0   0   0   60  0   0   0   0   0   60  0   0   0   0   0   0   126 0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   0   0   0   0   62  63  0   93
+	93  0   0   0   0   0   0   0   0   124 0   0   0   0   0   124 0   0   0   0   0   124 0   0   0   0   0   0   126 0   0   0   0   0   0   0   94  95  0   93
+	61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61
+}
+
+data   displist   {
 	nocross	
 	0x70
 	0x70
 	0x70
-	0x42 &<screen &>screen
-	for x=2..24 eval [0x02]
-	0x41 &<displist &>displist
+	0x42   &<screen   &>screen
+	for   x=2..24   eval   [0x02]
+	0x41   &<displist   &>displist
 }
 
-func nmi_fn {
-	//a!!
-	//a??
-	//return_i
-}
-
-main {
-	// disable OS
+main   {
+	//   disable   OS
 	NMIEN=a=0
 	DMACTL=a=0
 	i+
 	PORTB=a=0xFE
 	s=x=0xFF
 
-	COLBK =a=0xBA
+	COLBK=a=0xBA
 	//COLPF0=a=0x02
-	COLPF1=a=0x08
-	COLPF2=a=0x00
+	COLPF1=a=0xB8
+	COLPF2=a=0x52
 	//COLPF3=a=0xEF
+
+	// SPRITE SETTINGS
+	PMBASE=a=&>sprites
+	COLPM0=a=0x06
+    SIZEP0=a=0
+	HPOSP0=a=100
+	GRACTL=a=0b00000011
+
+
+	// DUPA
 	PRIOR=a=0x00
 	DLISTL=a=&<displist
 	DLISTH=a=&>displist
-	DMACTL=a=0x22
+	DMACTL=a=0b00111110
 	CHBASE=a=&>fonts
 	NMIEN=a=0x80
+	
+	x=0   {   a=x   sprites,x=a   x++   }   !=   //   0-255
+	x=0   {   a=x   sprites+256,x=a   x++   }   !=   //   256-511
+	x=0   {   a=x   sprites+512,x=a   x++   }   !=   //   512-767
+	x=0   {   a=x   sprites+768,x=a   x++   }   !=      //   767-1023	
 
-	x=0 { a=x a>> screen,x=a x++ }!=
-	x=0 { a=x a>> screen+256,x=a x++ }!=
-	x=0 { a=x a>> screen+512,x=a x++ }!=
-	x=0 { a=x a>> screen+768,x=a x++ }!=
+	x=0   {   a=x   sprites_h,x=a   x++   }   !=   //   0-255
+	x=0   {   a=x   sprites_h+256,x=a   x++   }   !=   //   256-511
+	x=0   {   a=x   sprites_h+512,x=a   x++   }   !=   //   512-767
+	x=0   {   a=x   sprites_h+768,x=a   x++   }   !=      //   767-1023	
+
+	x=0   {   a=map1,x   screen,x=a   x++   }   !=   //   0-255
+	x=0   {   a=map1+256,x   screen+256,x=a   x++   }   !=   //   256-511
+	x=0   {   a=map1+512,x   screen+512,x=a   x++   }   !=   //   512-767
+	x=0   {   a=map1+768,x   screen+768,x=a   x++   }   !=      //   767-1023
+
+
+	//   x=0   {   a=x   a>>   screen,x=a   x++   }!=
+	//   x=0   {   a=x   a>>   screen+256,x=a   x++   }!=
+	//   x=0   {   a=x   a>>   screen+512,x=a   x++   }!=
+	//   x=0   {   a=x   a>>   screen+768,x=a   x++   }!=
 
 	{
-		{ a=VCOUNT }!=
+		{   a=VCOUNT   }!=
 		//frame++
-		//a=frame a<< a<< c- a+frame a<<
+		//a=frame   a<<   a<<   c-   a+frame   a<<
 		//cursor=a=frame
 		//clbuff
 
-	} always
+	}   always
 
 }
