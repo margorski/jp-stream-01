@@ -2,10 +2,11 @@
 var screen = 0x9000;
 var frame;
 
-data fonts1 { address 0x5000 image "data/font" 0 0 8> 8v		tiles 8 0 31 }
-data fonts2 { address 0x5100 image "data/font" 0 8 8> 8v		tiles 8 0 31 }
-data fonts3 { address 0x5200 image "data/font" 0 16 8> 8v		tiles 8 0 31 }
-data fonts4 { address 0x5300 image "data/font" 0 24 8> 8v		tiles 8 0 31 }
+data fonts { address 0x5000 
+			 image "data/font" 0 0 8> 8v		tiles 8 0 31 
+			 image "data/font" 0 8 8> 8v		tiles 8 0 31 
+			 image "data/font" 0 16 8> 8v		tiles 8 0 31 
+			 image "data/font" 0 24 8> 8v		tiles 8 0 31 }
 
 data displist {
 	nocross	
@@ -40,10 +41,7 @@ main {
 	DLISTL=a=&<displist
 	DLISTH=a=&>displist
 	DMACTL=a=0x22
-	a=&>fonts4
-	a=&>fonts3
-	a=&>fonts2
-	CHBASE=a=&>fonts1
+	CHBASE=a=&>fonts
 	NMIEN=a=0x80
 
 	x=0 { a=x a>> screen,x=a x++ }!=
