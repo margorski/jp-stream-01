@@ -1,0 +1,9 @@
+inline SetHorizPos {
+    nocross {	// make sure following code doesn't cross page boundary
+        wsync { a-15 }>=0 a<< a<< a<< a<< a^0x70 hp0,x=a *5 rp0,x=a		// sprite position trick
+    }
+}
+
+inline BreakOnSeq {
+	a=songpos_seq a?seqbrk >= { return }
+}

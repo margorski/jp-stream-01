@@ -1,0 +1,7 @@
+# Hack for adding empty direcotry to repository and ignoring its contenct
+
+# Ignore everything in this directory 
+* 
+
+# Except this file 
+!.gitignore
