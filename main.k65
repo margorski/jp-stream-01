@@ -1,14 +1,18 @@
-
-var   frame;
 var   sprites  =   0x7000;
 var   sprites_h = 	0x7400;
 var   screen   =   0x9000;
+
+var ptr_a[2]=0xe0
+var frame, player_x, player_y, speed_y;
 
 data   fonts   {   address   0x5000
 			   image   "data/font"   0   0   8>   8v		tiles   8   0   31   
 			   image   "data/font"   0   8   8>   8v		tiles   8   0   31   
 			   image   "data/font"   0   16   8>   8v		tiles   8   0   31   
 			   image   "data/font"   0   24   8>   8v		tiles   8   0   31   }
+
+[PLAYER_SPRITE_HEIGHT=23]
+data   player   {   address   0x6000  image   "data/player"   0   0   8>   [PLAYER_SPRITE_HEIGHT]v   inv }
 
 data   map1   {	
 	61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61
@@ -47,8 +51,53 @@ data   displist   {
 	0x41   &<displist   &>displist
 }
 
-main   {
-	//   disable   OS
+inline handle_input {
+	// Check Joystick 0 Right
+	a=PORTA a&0x08 == {
+		player_x++		
+	}
+	
+	// Check Joystick 0 Left
+	a=PORTA a&0x04 == {
+		player_x--
+	}
+
+	// Check Joystick 0 Fire
+	a=TRIG0 == {
+		speed_y=a=0
+	}
+}
+
+inline set_sprite_position {
+	ptr_a=a=player_y
+	ptr_a+1=a=&>sprites_h
+
+	y=[PLAYER_SPRITE_HEIGHT-1] {
+		(ptr_a),y=a=player,y
+		y--
+	} !=
+	(ptr_a),y=a=0
+
+	HPOSP0=a=player_x		
+}
+
+[GRAVITY_FORCE=5]
+inline apply_gravity {
+	a=speed_y c- a+[GRAVITY_FORCE] speed_y=a
+	a>> a>> a>> a>> a>>	
+	c- a+player_y player_y=a	
+}
+
+[GROUND_LEVEL=161]
+inline check_collisiony_y {
+	a=player_y a?GROUND_LEVEL >= {
+		speed_y=a=0
+		player_y=a=[GROUND_LEVEL]
+	}
+}
+
+inline init {
+	// disable   OS	
 	NMIEN=a=0
 	DMACTL=a=0
 	i+
@@ -56,55 +105,45 @@ main   {
 	s=x=0xFF
 
 	COLBK=a=0xBA
-	//COLPF0=a=0x02
 	COLPF1=a=0xB8
 	COLPF2=a=0x52
-	//COLPF3=a=0xEF
 
 	// SPRITE SETTINGS
 	PMBASE=a=&>sprites
 	COLPM0=a=0x06
     SIZEP0=a=0
-	HPOSP0=a=100
+	HPOSP0=a=180
 	GRACTL=a=0b00000011
 
-
-	// DUPA
 	PRIOR=a=0x00
 	DLISTL=a=&<displist
 	DLISTH=a=&>displist
 	DMACTL=a=0b00111110
 	CHBASE=a=&>fonts
-	NMIEN=a=0x80
-	
-	x=0   {   a=x   sprites,x=a   x++   }   !=   //   0-255
-	x=0   {   a=x   sprites+256,x=a   x++   }   !=   //   256-511
-	x=0   {   a=x   sprites+512,x=a   x++   }   !=   //   512-767
-	x=0   {   a=x   sprites+768,x=a   x++   }   !=      //   767-1023	
+	NMIEN=a=0x80			
 
-	x=0   {   a=x   sprites_h,x=a   x++   }   !=   //   0-255
-	x=0   {   a=x   sprites_h+256,x=a   x++   }   !=   //   256-511
-	x=0   {   a=x   sprites_h+512,x=a   x++   }   !=   //   512-767
-	x=0   {   a=x   sprites_h+768,x=a   x++   }   !=      //   767-1023	
+	player_y=a=50
+	player_x=a=50
+	
+	x=0   {   a=0   sprites_h,x=a   x++   }   !=   //   0-255
+	x=0   {   a=0   sprites_h+256,x=a   x++   }   !=   //   256-511
+	x=0   {   a=0   sprites_h+512,x=a   x++   }   !=   //   512-767
+	x=0   {   a=0   sprites_h+768,x=a   x++   }   !=      //   767-1023	
 
 	x=0   {   a=map1,x   screen,x=a   x++   }   !=   //   0-255
 	x=0   {   a=map1+256,x   screen+256,x=a   x++   }   !=   //   256-511
 	x=0   {   a=map1+512,x   screen+512,x=a   x++   }   !=   //   512-767
 	x=0   {   a=map1+768,x   screen+768,x=a   x++   }   !=      //   767-1023
+}
 
-
-	//   x=0   {   a=x   a>>   screen,x=a   x++   }!=
-	//   x=0   {   a=x   a>>   screen+256,x=a   x++   }!=
-	//   x=0   {   a=x   a>>   screen+512,x=a   x++   }!=
-	//   x=0   {   a=x   a>>   screen+768,x=a   x++   }!=
-
+main   {	
+	init	
 	{
-		{   a=VCOUNT   }!=
-		//frame++
-		//a=frame   a<<   a<<   c-   a+frame   a<<
-		//cursor=a=frame
-		//clbuff
+		{ a=VCOUNT }!=
 
-	}   always
-
+		handle_input		
+		apply_gravity
+		check_collisiony_y
+		set_sprite_position
+	} always
 }
