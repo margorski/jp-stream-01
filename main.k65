@@ -4,6 +4,7 @@ var   screen   =   0x9000;
 
 var ptr_a[2]=0xe0
 var frame, player_x, player_y, speed_y;
+var temp1;
 
 data   fonts   {   address   0x5000
 			   image   "data/font"   0   0   8>   8v		tiles   8   0   31   
@@ -11,7 +12,7 @@ data   fonts   {   address   0x5000
 			   image   "data/font"   0   16   8>   8v		tiles   8   0   31   
 			   image   "data/font"   0   24   8>   8v		tiles   8   0   31   }
 
-[PLAYER_SPRITE_HEIGHT=23]
+[PLAYER_SPRITE_HEIGHT=26]
 data   player   {   address   0x6000  image   "data/player"   0   0   8>   [PLAYER_SPRITE_HEIGHT]v   inv }
 
 data   map1   {	
@@ -51,6 +52,7 @@ data   displist   {
 	0x41   &<displist   &>displist
 }
 
+[JUMP_SPEED=0xCE]
 inline handle_input {
 	// Check Joystick 0 Right
 	a=PORTA a&0x08 == {
@@ -64,7 +66,7 @@ inline handle_input {
 
 	// Check Joystick 0 Fire
 	a=TRIG0 == {
-		speed_y=a=0
+		speed_y=a=[JUMP_SPEED]
 	}
 }
 
@@ -82,18 +84,50 @@ inline set_sprite_position {
 }
 
 [GRAVITY_FORCE=5]
+[MAX_POSITIVE_SPEED=0x7F]
 inline apply_gravity {
-	a=speed_y c- a+[GRAVITY_FORCE] speed_y=a
-	a>> a>> a>> a>> a>>	
-	c- a+player_y player_y=a	
+	a=speed_y c- a+[GRAVITY_FORCE] <<={ a=[MAX_POSITIVE_SPEED] } speed_y=a 	
 }
 
-[GROUND_LEVEL=161]
-inline check_collisiony_y {
-	a=player_y a?GROUND_LEVEL >= {
-		speed_y=a=0
-		player_y=a=[GROUND_LEVEL]
+inline update_vertical {	
+	a=speed_y <0 {
+		u2 
+		a>> a>> a>> a>>
+		temp1=a a=player_y c+ a-temp1 player_y=a
 	}
+	else {
+		a>> a>> a>> a>>
+		c- a+player_y player_y=a
+	}	
+}	
+
+//[GROUND_LEVEL=80]
+inline check_collisiony_y {
+	a=speed_y >=0 {
+		x=player_x
+		y=player_y
+		get_tile_from_sprite_coordinates
+		a?61 == {
+			speed_y=a=0
+		}
+		// POSTAĆ SPADA
+
+		// WYZNACZ LEWY DOLNY ROG DUSZKA
+		// WYZNACZ PRAWY DOLNY ROG DUSZKA
+
+		// 2 tilesy albo 3
+		// ITERUJ PO TILESACH
+			// CZY JEST KOLIZJA?
+				// JESLI TAK SPEEDY=0, ONGROUND=1, RETURN
+	}
+	else {
+		// POSTAĆ WZLATUJE
+
+	}
+	// a=player_y a?GROUND_LEVEL >= {
+	// 	speed_y=a=0
+	// 	player_y=a=[GROUND_LEVEL]
+	// }
 }
 
 inline init {
@@ -123,7 +157,7 @@ inline init {
 	NMIEN=a=0x80			
 
 	player_y=a=50
-	player_x=a=50
+	player_x=a=80
 	
 	x=0   {   a=0   sprites_h,x=a   x++   }   !=   //   0-255
 	x=0   {   a=0   sprites_h+256,x=a   x++   }   !=   //   256-511
@@ -141,9 +175,14 @@ main   {
 	{
 		{ a=VCOUNT }!=
 
-		handle_input		
+		handle_input		 
+		
 		apply_gravity
+		update_vertical		
 		check_collisiony_y
+
+
+
 		set_sprite_position
 	} always
 }

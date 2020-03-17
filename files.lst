@@ -3,6 +3,7 @@
 -lowAddr 0x4000
 
 _defs.k65		main
+util.k65        main
 main.k65		main
 
 -o bin\example.xex

@@ -1,9 +1,25 @@
-inline SetHorizPos {
-    nocross {	// make sure following code doesn't cross page boundary
-        wsync { a-15 }>=0 a<< a<< a<< a<< a^0x70 hp0,x=a *5 rp0,x=a		// sprite position trick
-    }
+inline u2 {
+    // XOR z 0xff żeby zanegować
+    a^0xff c- a+1
 }
 
-inline BreakOnSeq {
-	a=songpos_seq a?seqbrk >= { return }
+// x, y - trybu znakowego
+inline get_tile {
+    ptr_a=a=&<screen
+	ptr_a+1=a=&>screen
+
+    a=y != {
+        {
+            a=ptr_a c- a+40 ptr_a=a a=ptr_a+1 a+0 ptr_a+1=a
+            y--
+        } !=
+    }
+    a=(ptr_a,x)
+}
+
+// x, y - gracza
+inline get_tile_from_sprite_coordinates {
+    a=x c- a+30 a>> a>> a>> a>> x=a 
+    a=y c- a+24 a>> a>> a>> a>> a>> y=a
+    get_tile
 }
