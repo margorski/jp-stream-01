@@ -4,7 +4,7 @@ var   screen   =   0x9000;
 
 var ptr_a[2]=0xe0
 var frame, player_x, player_y, speed_y;
-var temp1;
+var temp1, temp2, temp3, temp4;
 
 data   fonts   {   address   0x5000
 			   image   "data/font"   0   0   8>   8v		tiles   8   0   31   
@@ -12,33 +12,34 @@ data   fonts   {   address   0x5000
 			   image   "data/font"   0   16   8>   8v		tiles   8   0   31   
 			   image   "data/font"   0   24   8>   8v		tiles   8   0   31   }
 
-[PLAYER_SPRITE_HEIGHT=26]
-data   player   {   address   0x6000  image   "data/player"   0   0   8>   [PLAYER_SPRITE_HEIGHT]v   inv }
+[PLAYER_HEIGHT=16]
+[PLAYER_WIDTH=8]
+data   player   {   address   0x6000  image   "data/player"   0   0   8>   [PLAYER_HEIGHT]v   inv }
 
 data   map1   {	
 	61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   92  0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   92  0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   0  60   0   0   0   60  0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 61  61  61  61  61  61  61  61  61  0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   125 0   0   125 0   0   0   93
-	93  0   0   0   0   0   0   0   0   60  0   0   0   0   0   60  0   0   0   0   0   60  0   0   0   0   0   0   126 0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   0   0   0   0   62  63  0   93
-	93  0   0   0   0   0   0   0   0   124 0   0   0   0   0   124 0   0   0   0   0   124 0   0   0   0   0   0   126 0   0   0   0   0   0   0   94  95  0   93
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   92  0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   92  0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   0  60   0   0   0   60  0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 61  61  61  61  61  61  61  61  61  0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   125 0   0   125 0   0   0   61
+	61  0   0   0   0   0   0   0   0   60  0   0   0   0   0   60  0   0   0   0   0   60  0   0   0   0   0   0   126 0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   126 0   0   0   0   0   0   0   62  63  0   61
+	61  0   0   0   0   0   0   0   0   124 0   0   0   0   0   124 0   0   0   0   0   124 0   0   0   0   0   0   126 0   0   0   0   0   0   0   94  95  0   61
 	61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
-	93  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   93
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
+	61  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   61
 	61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61  61
 }
 
@@ -52,16 +53,60 @@ data   displist   {
 	0x41   &<displist   &>displist
 }
 
+inline check_collision_right {
+	a=player_x c- a+[PLAYER_WIDTH] x=a y=player_y
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_right }
+
+	a=player_x c- a+[PLAYER_WIDTH] x=a a=player_y c- a+[PLAYER_HEIGHT/2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_right }
+
+	a=player_x c- a+[PLAYER_WIDTH] x=a a=player_y c- a+[PLAYER_HEIGHT-2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_right }
+	
+	goto .collision_right_check_end
+
+.found_collision_right:
+	a=x a<< a<< c- a+[48-PLAYER_WIDTH]
+	player_x=a
+.collision_right_check_end:
+}
+
+inline check_collision_left {
+	x=player_x y=player_y
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_left }
+
+	x=player_x a=player_y c- a+[PLAYER_HEIGHT/2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_left }
+
+	x=player_x a=player_y c- a+[PLAYER_HEIGHT-2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_left }
+	
+	goto .collision_left_check_end
+
+.found_collision_left:
+	a=x a<< a<< c- a+[48+PLAYER_WIDTH/2]
+	player_x=a
+.collision_left_check_end:
+}
+
 [JUMP_SPEED=0xCE]
 inline handle_input {
 	// Check Joystick 0 Right
 	a=PORTA a&0x08 == {
-		player_x++		
+		player_x++
+		check_collision_right		
 	}
 	
 	// Check Joystick 0 Left
 	a=PORTA a&0x04 == {
 		player_x--
+		check_collision_left
 	}
 
 	// Check Joystick 0 Fire
@@ -70,23 +115,31 @@ inline handle_input {
 	}
 }
 
-inline set_sprite_position {
-	ptr_a=a=player_y
+inline clear_old_player_sprite {
+	a=player_y c- a+8 ptr_a=a	
 	ptr_a+1=a=&>sprites_h
-
-	y=[PLAYER_SPRITE_HEIGHT-1] {
-		(ptr_a),y=a=player,y
+	y=[PLAYER_HEIGHT-1] {
+		(ptr_a),y=a=0
 		y--
 	} !=
 	(ptr_a),y=a=0
+}
 
-	HPOSP0=a=player_x		
+inline draw_sprite {
+	a=player_y c- a+8 ptr_a=a	
+	ptr_a+1=a=&>sprites_h
+
+	y=[PLAYER_HEIGHT-1] {
+		(ptr_a),y=a=player,y
+		y--
+	} !=
+	(ptr_a),y=a=player
 }
 
 [GRAVITY_FORCE=5]
 [MAX_POSITIVE_SPEED=0x7F]
 inline apply_gravity {
-	a=speed_y c- a+[GRAVITY_FORCE] <<={ a=[MAX_POSITIVE_SPEED] } speed_y=a 	
+	a=speed_y c- a+[GRAVITY_FORCE] <<= { a=[MAX_POSITIVE_SPEED] } speed_y=a 	
 }
 
 inline update_vertical {	
@@ -101,35 +154,51 @@ inline update_vertical {
 	}	
 }	
 
-//[GROUND_LEVEL=80]
 inline check_collisiony_y {
 	a=speed_y >=0 {
-		x=player_x
-		y=player_y
+		x=player_x a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
 		get_tile_from_sprite_coordinates
-		a?61 == {
-			speed_y=a=0
-		}
-		// POSTAĆ SPADA
+		a?61 == { goto .found_collision_down }
 
-		// WYZNACZ LEWY DOLNY ROG DUSZKA
-		// WYZNACZ PRAWY DOLNY ROG DUSZKA
+		a=player_x c- a+[PLAYER_WIDTH/2] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_down }
 
-		// 2 tilesy albo 3
-		// ITERUJ PO TILESACH
-			// CZY JEST KOLIZJA?
-				// JESLI TAK SPEEDY=0, ONGROUND=1, RETURN
+		a=player_x c- a+[PLAYER_WIDTH-1] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_down }
+		
+		goto .collision_down_check_end
+
+.found_collision_down:
+		speed_y=a=0
+		a=y a<< a<< a<< c- a+[24-PLAYER_HEIGHT]
+		player_y=a		
+.collision_down_check_end:
 	}
 	else {
-		// POSTAĆ WZLATUJE
+		x=player_x y=player_y
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_up }
 
-	}
-	// a=player_y a?GROUND_LEVEL >= {
-	// 	speed_y=a=0
-	// 	player_y=a=[GROUND_LEVEL]
-	// }
+		a=player_x c- a+[PLAYER_WIDTH/2] x=a y=player_y
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_up }
+
+		a=player_x c- a+[PLAYER_WIDTH-1] x=a y=player_y
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_up }
+		
+		goto .collision_up_check_end
+
+.found_collision_up:
+		speed_y=a=0
+		a=y a<< a<< a<< c- a+[24+8]
+		player_y=a		
+.collision_up_check_end:	
+	}	
 }
-
+	
 inline init {
 	// disable   OS	
 	NMIEN=a=0
@@ -174,6 +243,8 @@ main   {
 	init	
 	{
 		{ a=VCOUNT }!=
+		
+		clear_old_player_sprite
 
 		handle_input		 
 		
@@ -181,8 +252,7 @@ main   {
 		update_vertical		
 		check_collisiony_y
 
-
-
-		set_sprite_position
+		HPOSP0=a=player_x		
+		draw_sprite
 	} always
 }

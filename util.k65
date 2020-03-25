@@ -7,6 +7,7 @@ inline u2 {
 inline get_tile {
     ptr_a=a=&<screen
 	ptr_a+1=a=&>screen
+    temp1=y
 
     a=y != {
         {
@@ -14,12 +15,16 @@ inline get_tile {
             y--
         } !=
     }
-    a=(ptr_a,x)
+
+    temp2=x
+    y=temp2
+    a=(ptr_a),y    
+    y=temp1
 }
 
 // x, y - gracza
-inline get_tile_from_sprite_coordinates {
-    a=x c- a+30 a>> a>> a>> a>> x=a 
-    a=y c- a+24 a>> a>> a>> a>> a>> y=a
+func get_tile_from_sprite_coordinates {
+    a=x c+ a-48 a>> a>> x=a 
+    a=y c+ a-24 a>> a>> a>> y=a
     get_tile
 }
