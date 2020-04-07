@@ -1,7 +1,7 @@
 // CONSTANTS
 [PLAYER_HEIGHT=16]
 [PLAYER_WIDTH=8]
-[JUMP_SPEED=0xCE]
+[FLY_SPEED=0xCE]
 [LIVES_COUNT=3]
 [GRAVITY_FORCE=5]
 [MAX_POSITIVE_SPEED=0x7F]
@@ -106,79 +106,100 @@ func player__check_collision_left {
 .collision_left_check_end:
 }
 
-func player__check_collision_y {
-	a=player_speed_y >=0 {
-		x=player_x a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
-		get_tile_from_sprite_coordinates
-		a?61 == { goto .found_collision_down }
-		else { 	
-			a?0 != {
-				player__handle_collision_with_tile
-			}		
-		}
 
-		a=player_x c- a+[PLAYER_WIDTH/2] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
-		get_tile_from_sprite_coordinates
-		a?61 == { goto .found_collision_down }
-		else { 	
-			a?0 != {
-				player__handle_collision_with_tile
-			}		
-		}
+func temp__collision_down {
+    player_speed_y=a=0
+    a=y a<< a<< a<< c- a+[24-PLAYER_HEIGHT]                
+    player_y=a
+    a=player_fuel c- a+1 a?64 >= {a=64} player_fuel=a
+    a=204 c+ a-player_fuel x=a 
+    sprites_missile,x=a=0x0C
+}
 
-		a=player_x c- a+[PLAYER_WIDTH-1] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
-		get_tile_from_sprite_coordinates
-		a?61 == { goto .found_collision_down }
-		else { 	
-			a?0 != {
-				player__handle_collision_with_tile
-			}		
-		}
+func temp__collision_up {
+    player_speed_y=a=0
+    a=y a<< a<< a<< c- a+[24+8]
+    player_y=a	
+}
 
-		goto .collision_down_check_end
+func player__check_collision_down {
+    // TODO: Consider to rewrite that part as a loop or two nested loops
+    x=player_x a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+    get_tile_from_sprite_coordinates
+    a?61 == { goto .found_collision_down }
+    else { 	
+        a?0 != {
+            player__handle_collision_with_tile
+        }		
+    }
+
+    a=player_x c- a+[PLAYER_WIDTH/2] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+    get_tile_from_sprite_coordinates
+    a?61 == { goto .found_collision_down }
+    else { 	
+        a?0 != {
+            player__handle_collision_with_tile
+        }		
+    }
+
+    a=player_x c- a+[PLAYER_WIDTH-1] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+    get_tile_from_sprite_coordinates
+    a?61 == { goto .found_collision_down }
+    else { 	
+        a?0 != {
+            player__handle_collision_with_tile
+        }		
+    }
+
+    goto .collision_down_check_end
 
 .found_collision_down:
-		player_speed_y=a=0
-		a=y a<< a<< a<< c- a+[24-PLAYER_HEIGHT]
-		player_y=a		
+    temp__collision_down
 .collision_down_check_end:
+}
+
+func player__check_collision_up {
+    // TODO: Consider to rewrite that part as a loop or two nested loops
+    x=player_x y=player_y
+    get_tile_from_sprite_coordinates
+    a?61 == { goto .found_collision_up }
+    else { 	
+        a?0 != {
+            player__handle_collision_with_tile
+        }		
+    }
+
+    a=player_x c- a+[PLAYER_WIDTH/2] x=a y=player_y
+    get_tile_from_sprite_coordinates
+    a?61 == { goto .found_collision_up }
+    else { 	
+        a?0 != {
+            player__handle_collision_with_tile
+        }		
+    }
+
+    a=player_x c- a+[PLAYER_WIDTH-1] x=a y=player_y
+    get_tile_from_sprite_coordinates
+    a?61 == { goto .found_collision_up }
+    else { 	
+        a?0 != {
+            player__handle_collision_with_tile
+        }		
+    }
+
+    goto .collision_up_check_end
+.found_collision_up:
+    temp__collision_up
+.collision_up_check_end:		
+}
+
+func player__check_collision_y {
+	a=player_speed_y >=0 {
+		player__check_collision_down
 	}
 	else {
-		x=player_x y=player_y
-		get_tile_from_sprite_coordinates
-		a?61 == { goto .found_collision_up }
-		else { 	
-			a?0 != {
-				player__handle_collision_with_tile
-			}		
-		}
-
-		a=player_x c- a+[PLAYER_WIDTH/2] x=a y=player_y
-		get_tile_from_sprite_coordinates
-		a?61 == { goto .found_collision_up }
-		else { 	
-			a?0 != {
-				player__handle_collision_with_tile
-			}		
-		}
-
-		a=player_x c- a+[PLAYER_WIDTH-1] x=a y=player_y
-		get_tile_from_sprite_coordinates
-		a?61 == { goto .found_collision_up }
-		else { 	
-			a?0 != {
-				player__handle_collision_with_tile
-			}		
-		}
-
-		goto .collision_up_check_end
-
-.found_collision_up:
-		player_speed_y=a=0
-		a=y a<< a<< a<< c- a+[24+8]
-		player_y=a		
-.collision_up_check_end:	
-	}	
+	    player__check_collision_up	
+    }
 }
 
 inline player__apply_gravity {
@@ -200,7 +221,7 @@ inline player__update_vertical {
 
 inline player__clear_sprite {
 	a=player_y c- a+8 ptr_a=a	
-	ptr_a+1=a=&>sprites_h
+	ptr_a+1=a=&>sprites_player1
 	y=[PLAYER_HEIGHT-1] {
 		(ptr_a),y=a=0
 		y--
@@ -210,7 +231,7 @@ inline player__clear_sprite {
 
 inline player__draw_sprite {
 	a=player_y c- a+8 ptr_a=a	
-	ptr_a+1=a=&>sprites_h
+	ptr_a+1=a=&>sprites_player1
 
 	y=[PLAYER_HEIGHT-1] {
 		(ptr_a),y=a=player,y
