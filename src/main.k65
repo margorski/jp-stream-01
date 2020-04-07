@@ -1,0 +1,105 @@
+data   displist   {
+	nocross	
+	0x70
+	0x70
+	0x70
+	0x42   &<screen   &>screen
+	for   x=2..24   eval   [0x02]
+	0x41   &<displist   &>displist
+}
+
+
+inline init {
+	// disable   OS	
+	NMIEN=a=0
+	DMACTL=a=0
+	i+
+	PORTB=a=0xFE
+	s=x=0xFF
+
+	COLBK=a=0xBA
+	COLPF1=a=0xB8
+	COLPF2=a=0x52
+
+	// SPRITE SETTINGS
+	PMBASE=a=&>sprites
+	COLPM0=a=0x06
+    SIZEP0=a=0
+	HPOSP0=a=180
+	GRACTL=a=0b00000011
+
+	PRIOR=a=0x00
+	DLISTL=a=&<displist
+	DLISTH=a=&>displist
+	DMACTL=a=0b00111110
+	CHBASE=a=&>fonts
+	NMIEN=a=0x80			
+
+	player__reset
+	player_lives=a=[LIVES_COUNT]
+	gamestate_flags=a=0
+
+	x=0   {   a=0   sprites_h,x=a   x++   }   !=   //   0-255
+	x=0   {   a=0   sprites_h+256,x=a   x++   }   !=   //   256-511
+	x=0   {   a=0   sprites_h+512,x=a   x++   }   !=   //   512-767
+	x=0   {   a=0   sprites_h+768,x=a   x++   }   !=      //   767-1023	
+
+	x=0   {   a=map1,x   screen,x=a   x++   }   !=   //   0-255
+	x=0   {   a=map1+256,x   screen+256,x=a   x++   }   !=   //   256-511
+	x=0   {   a=map1+512,x   screen+512,x=a   x++   }   !=   //   512-767
+	x=0   {   a=map1+768,x   screen+768,x=a   x++   }   !=      //   767-1023
+
+	hud__draw_lives
+}
+
+// player_temp_speed_x is an hack for not implementing player horizontal speed and constant value of 1
+inline handle_input {
+	player_temp_speed_x=a=0
+
+	// Check Joystick 0 Right
+	a=PORTA a&0x08 == {
+		player_x++
+		player_temp_speed_x=a=1
+		player__check_collision_right		
+	}
+	
+	// Check Joystick 0 Left
+	a=PORTA a&0x04 == {
+		player_x--
+		player_temp_speed_x=a=0xFF // -1 w U2
+		player__check_collision_left
+	}
+
+	// Check Joystick 0 Fire
+	a=TRIG0 == {
+		player_speed_y=a=[JUMP_SPEED]
+	}
+}
+
+main   {	
+.init_level:
+	init	
+	{
+		{ a=VCOUNT }!=
+		
+		a=gamestate_flags != {
+			{
+				// Check Joystick 0 Fire
+				a=TRIG0 == {
+					goto .init_level
+				}
+			}always
+		}
+
+		player__clear_sprite
+
+		handle_input		 
+		
+		player__apply_gravity
+		player__update_vertical		
+		player__check_collision_y
+		
+		HPOSP0=a=player_x		
+		player__draw_sprite
+	} always
+}

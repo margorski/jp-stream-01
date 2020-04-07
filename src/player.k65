@@ -1,0 +1,220 @@
+// CONSTANTS
+[PLAYER_HEIGHT=16]
+[PLAYER_WIDTH=8]
+[JUMP_SPEED=0xCE]
+[LIVES_COUNT=3]
+[GRAVITY_FORCE=5]
+[MAX_POSITIVE_SPEED=0x7F]
+
+// STATIC DATA
+data   player   {   address   0x6000  image   "data/player"   0   0   8>   [PLAYER_HEIGHT]v   inv }
+
+// FUNCTIONS
+// reset player state to initial values
+func player__reset {
+	player_y=a=50
+	player_x=a=80
+	player_speed_y=player_temp_speed_x=a=0
+}
+
+// handle losing life
+inline player__died {
+    player_lives-- 
+    hud__update_lives
+    player__reset
+}
+
+func player__handle_collision_with_tile {
+	a?92 == {
+		a=player_lives == { gamestate_flags=a=1 }
+		else {
+			player__died
+		}
+	}
+}
+
+// check collision on right side
+func player__check_collision_right {
+	a=player_x c- a+[PLAYER_WIDTH] x=a y=player_y
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_right }
+	else { 	
+		a?0 != {
+			player__handle_collision_with_tile
+		}		
+	}
+
+	a=player_x c- a+[PLAYER_WIDTH] x=a a=player_y c- a+[PLAYER_HEIGHT/2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_right }
+	else { 	
+		a?0 != {
+			player__handle_collision_with_tile
+		}		
+	}
+
+	a=player_x c- a+[PLAYER_WIDTH] x=a a=player_y c- a+[PLAYER_HEIGHT-2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_right }
+	else { 	
+		a?0 != {
+			player__handle_collision_with_tile
+		}		
+	}
+
+	goto .collision_right_check_end
+
+.found_collision_right:
+	a=x a<< a<< c- a+[48-PLAYER_WIDTH]
+	player_x=a
+.collision_right_check_end:
+}
+
+func player__check_collision_left {
+	x=player_x y=player_y
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_left }
+	else { 	
+		a?0 != {
+			player__handle_collision_with_tile
+		}		
+	}
+
+	x=player_x a=player_y c- a+[PLAYER_HEIGHT/2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_left }
+	else { 	
+		a?0 != {
+			player__handle_collision_with_tile
+		}		
+	}
+
+	x=player_x a=player_y c- a+[PLAYER_HEIGHT-2] y=a
+	get_tile_from_sprite_coordinates
+	a?61 == { goto .found_collision_left }
+	else { 	
+		a?0 != {
+			player__handle_collision_with_tile
+		}		
+	}
+
+	goto .collision_left_check_end
+
+.found_collision_left:
+	a=x a<< a<< c- a+[48+PLAYER_WIDTH/2]
+	player_x=a
+.collision_left_check_end:
+}
+
+func player__check_collision_y {
+	a=player_speed_y >=0 {
+		x=player_x a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_down }
+		else { 	
+			a?0 != {
+				player__handle_collision_with_tile
+			}		
+		}
+
+		a=player_x c- a+[PLAYER_WIDTH/2] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_down }
+		else { 	
+			a?0 != {
+				player__handle_collision_with_tile
+			}		
+		}
+
+		a=player_x c- a+[PLAYER_WIDTH-1] x=a a=player_y c- a+[PLAYER_HEIGHT-1] y=a		
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_down }
+		else { 	
+			a?0 != {
+				player__handle_collision_with_tile
+			}		
+		}
+
+		goto .collision_down_check_end
+
+.found_collision_down:
+		player_speed_y=a=0
+		a=y a<< a<< a<< c- a+[24-PLAYER_HEIGHT]
+		player_y=a		
+.collision_down_check_end:
+	}
+	else {
+		x=player_x y=player_y
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_up }
+		else { 	
+			a?0 != {
+				player__handle_collision_with_tile
+			}		
+		}
+
+		a=player_x c- a+[PLAYER_WIDTH/2] x=a y=player_y
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_up }
+		else { 	
+			a?0 != {
+				player__handle_collision_with_tile
+			}		
+		}
+
+		a=player_x c- a+[PLAYER_WIDTH-1] x=a y=player_y
+		get_tile_from_sprite_coordinates
+		a?61 == { goto .found_collision_up }
+		else { 	
+			a?0 != {
+				player__handle_collision_with_tile
+			}		
+		}
+
+		goto .collision_up_check_end
+
+.found_collision_up:
+		player_speed_y=a=0
+		a=y a<< a<< a<< c- a+[24+8]
+		player_y=a		
+.collision_up_check_end:	
+	}	
+}
+
+inline player__apply_gravity {
+	a=player_speed_y c- a+[GRAVITY_FORCE] <<= { a=[MAX_POSITIVE_SPEED] } player_speed_y=a 	
+}
+
+inline player__update_vertical {	
+	a=player_speed_y <0 {
+		u2 
+		a>> a>> a>> a>>
+		temp1=a a=player_y c+ a-temp1 player_y=a
+	}
+	else {
+		a>> a>> a>> a>>
+		c- a+player_y player_y=a
+	}	
+}	
+
+
+inline player__clear_sprite {
+	a=player_y c- a+8 ptr_a=a	
+	ptr_a+1=a=&>sprites_h
+	y=[PLAYER_HEIGHT-1] {
+		(ptr_a),y=a=0
+		y--
+	} !=
+	(ptr_a),y=a=0
+}
+
+inline player__draw_sprite {
+	a=player_y c- a+8 ptr_a=a	
+	ptr_a+1=a=&>sprites_h
+
+	y=[PLAYER_HEIGHT-1] {
+		(ptr_a),y=a=player,y
+		y--
+	} !=
+	(ptr_a),y=a=player
+}

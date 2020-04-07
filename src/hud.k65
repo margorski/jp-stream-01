@@ -1,0 +1,37 @@
+
+inline hud__draw_lives {
+    // set pointer to first heart
+	ptr_a=a=0x9D
+	ptr_a+1=a=&>screen	
+	x=player_lives {	
+		y=0 (ptr_a),y=a=89		// left top heart char
+		y=1 (ptr_a),y=a=90      // right top heart char
+		y=40 (ptr_a),y=a=121    // left bottom heart char 
+		y=41 (ptr_a),y=a=122    // right bottom heart char
+
+        // add 120 (3 screen rows)
+		a=ptr_a c- a+120 ptr_a=a a=ptr_a+1 a+0 ptr_a+1=a
+
+		x--
+	} !=
+}
+
+inline hud__update_lives {
+     // set pointer to first heart
+    ptr_a=a=0x9D
+    ptr_a+1=a=&>screen
+
+    x=player_lives 
+    .loop: != {
+        // add 120 (3 screen rows)
+        a=ptr_a c- a+120 ptr_a=a a=ptr_a+1 a+0 ptr_a+1=a
+        x--
+        goto .loop
+    }
+
+    a=0
+    y=0 (ptr_a),y=a		// left top heart char
+    y=1 (ptr_a),y=a 	// right top heart char
+    y=40 (ptr_a),y=a	// left bottom heart char 
+    y=41 (ptr_a),y=a 	// right bottom heart char
+}
