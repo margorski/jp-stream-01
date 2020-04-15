@@ -1,6 +1,7 @@
 // CONSTANTS
 [PLAYER_HEIGHT=16]
 [PLAYER_WIDTH=8]
+[PLAYER_FUEL=63]
 [FLY_SPEED=0xCE]
 [LIVES_COUNT=3]
 [GRAVITY_FORCE=5]
@@ -10,27 +11,78 @@
 data   player   {   address   0x6000  image   "data/player"   0   0   8>   [PLAYER_HEIGHT]v   inv }
 
 // FUNCTIONS
+func player__fly {
+	a=player_fuel != {
+		player_speed_y=a=[FLY_SPEED]										
+    	a=204 c- a-player_fuel x=a 
+    	sprites_missile,x=a=0
+		player_fuel--
+	}
+}
+
+inline player__fill_fuel {
+	// temp solution	
+	a=player_fuel c- a+1 a?PLAYER_FUEL >= { a=PLAYER_FUEL } player_fuel=a	
+	a=204 c- a-player_fuel x=a     
+	sprites_missile,x=a=0x0c
+}
+
 // reset player state to initial values
 func player__reset {
 	player_y=a=50
 	player_x=a=80
 	player_speed_y=player_temp_speed_x=a=0
+	player_fuel=a=[PLAYER_FUEL]
 }
 
 // handle losing life
 inline player__died {
     player_lives-- 
     hud__update_lives
+	hud__draw_full_fuel
     player__reset
 }
 
 func player__handle_collision_with_tile {
 	a?92 == {
+	a=player_lives == { gamestate_flags=a=1 }
+		else {
+			player__died
+		}
+		goto .end_func
+	}
+	a?124 == {
 		a=player_lives == { gamestate_flags=a=1 }
 		else {
 			player__died
 		}
+		goto .end_func
 	}
+	a?125 == {
+		a=player_lives == { gamestate_flags=a=1 }
+		else {
+			player__died
+		}
+		goto .end_func
+	}
+	
+
+	a?60 == {
+		gamestate_keys--
+		clear_tile
+		goto .end_func			
+	}
+	
+	a?95 == {
+		temp1=a 		
+		a=gamestate_keys == {
+			gamestate_flags=a=1
+		}
+		a=temp1
+		goto .end_func
+	}
+
+	.end_func:
 }
 
 // check collision on right side
@@ -111,9 +163,7 @@ func temp__collision_down {
     player_speed_y=a=0
     a=y a<< a<< a<< c- a+[24-PLAYER_HEIGHT]                
     player_y=a
-    a=player_fuel c- a+1 a?64 >= {a=64} player_fuel=a
-    a=204 c+ a-player_fuel x=a 
-    sprites_missile,x=a=0x0C
+	player__fill_fuel
 }
 
 func temp__collision_up {
@@ -154,7 +204,7 @@ func player__check_collision_down {
     goto .collision_down_check_end
 
 .found_collision_down:
-    temp__collision_down
+    temp__collision_down	
 .collision_down_check_end:
 }
 

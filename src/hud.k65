@@ -35,3 +35,7 @@ inline hud__update_lives {
     y=40 (ptr_a),y=a	// left bottom heart char 
     y=41 (ptr_a),y=a 	// right bottom heart char
 }
+
+inline hud__draw_full_fuel {
+    x=140   {   a=0x0C   sprites_missile,x=a   x++  x?204 }   !=   //   140-204
+}

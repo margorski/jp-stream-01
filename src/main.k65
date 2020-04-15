@@ -37,27 +37,22 @@ inline init {
 
 	player__reset
 	player_lives=a=[LIVES_COUNT]
-	
+
 	// tt
-	player_fuel=a=64
 	SIZEM=a=12
 	HPOSM1=a=196
 
-	gamestate_flags=a=0
+	gamestate_flags=gamestate_keys=a=0
 
-	x=140   {   a=0x0C   sprites_missile,x=a   x++  x?204 }   !=   //   140-204
-
-	x=0   {   a=0   sprites_player1,x=a   x++   }   !=   //   0-255
+	x=0   {   a=0   sprites_player1,x=a   x++   }   !=   	 //   0-255
 	x=0   {   a=0   sprites_player1+256,x=a   x++   }   !=   //   256-511
 	x=0   {   a=0   sprites_player1+512,x=a   x++   }   !=   //   512-767
-	x=0   {   a=0   sprites_player1+768,x=a   x++   }   !=      //   767-1023	
+	x=0   {   a=0   sprites_player1+768,x=a   x++   }   !=   //   767-1023	
 
-	x=0   {   a=map1,x   screen,x=a   x++   }   !=   //   0-255
-	x=0   {   a=map1+256,x   screen+256,x=a   x++   }   !=   //   256-511
-	x=0   {   a=map1+512,x   screen+512,x=a   x++   }   !=   //   512-767
-	x=0   {   a=map1+768,x   screen+768,x=a   x++   }   !=      //   767-1023
-
-	hud__draw_lives
+	map__load_and_init
+	
+	hud__draw_lives	
+    hud__draw_full_fuel
 }
 
 // player_temp_speed_x is an hack for not implementing player horizontal speed and constant value of 1
@@ -80,12 +75,7 @@ func handle_input {
 
 	// Check Joystick 0 Fire
 	a=TRIG0 == {
-		a=player_fuel != {
-			player_speed_y=a=[FLY_SPEED]								
-			a=204 c+ a-player_fuel x=a
-			sprites_missile,x=a=0x0
-			player_fuel--
-		}
+		player__fly
 	}
 }
 
@@ -109,10 +99,11 @@ main   {
 		handle_input
 		
 		player__apply_gravity
-		player__update_vertical		
+		player__update_vertical
 		player__check_collision_y
-		
-		HPOSP0=a=player_x		
+
+		HPOSP0=a=player_x			
 		player__draw_sprite
+		map__update_door	
 	} always
 }

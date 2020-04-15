@@ -3,7 +3,7 @@ inline u2 {
     a^0xff c- a+1
 }
 
-// x, y - trybu znakowego
+// x, y - tile coordinates
 inline get_tile {
     ptr_a=a=&<screen
 	ptr_a+1=a=&>screen
@@ -22,9 +22,29 @@ inline get_tile {
     y=temp1
 }
 
-// x, y - gracza
+// x, y - player coordinates
 func get_tile_from_sprite_coordinates {
     a=x c+ a-48 a>> a>> x=a 
     a=y c+ a-24 a>> a>> a>> y=a
     get_tile
+}
+
+// x, y - tile coordinates, a - character to set
+func clear_tile {
+ptr_a=a=&<screen
+	ptr_a+1=a=&>screen
+    temp1=y
+
+    a=y != {
+        {
+            a=ptr_a c- a+40 ptr_a=a a=ptr_a+1 a+0 ptr_a+1=a
+            y--
+        } !=
+    }
+
+    temp2=x
+    y=temp2
+    
+    (ptr_a),y=a=0
+    y=temp1
 }

@@ -11,6 +11,6 @@ var   sprites_player1 = 0x7400;
 var   sprites_missile = 0x72FA;
 var   screen = 0x9000;
 
-var ptr_a[2]=0x0, ptr_b[2], ptr_c[2], ptr_d[2], ptr_e[2], ptr_f[2], temp1, temp2, temp3, temp4
+var ptr_a[2]=0x0, ptr_b[2], ptr_c[2], ptr_d[2], ptr_e[2], ptr_doors[2], temp1, temp2, temp3, temp4
 var player_x=0x10, player_y, player_temp_speed_x, player_speed_y, player_lives, player_fuel
-var gamestate_flags=0x20
+var gamestate_flags=0x20, gamestate_keys
