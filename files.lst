@@ -2,15 +2,15 @@
 -noOS
 -lowAddr 0x4000
 
-src\_defs.k65		main
-src\defs.k65		main
-src\maps.k65        main
-src\map.k65         main
-src\util.k65        main
-src\hud.k65         main
-src\player.k65      main
-src\main.k65		main
+src/_defs.k65		main
+src/defs.k65		main
+src/maps.k65        main
+src/map.k65         main
+src/util.k65        main
+src/hud.k65         main
+src/player.k65      main
+src/main.k65		main
 
--o bin\example.xex
+-o bin/example.xex
 
 -link
