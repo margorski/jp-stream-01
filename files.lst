@@ -4,7 +4,8 @@
 
 src/_defs.k65		main
 src/defs.k65		main
-src/maps.k65        main
+src/consts.k65		main
+src/map1.k65        main
 src/map.k65         main
 src/util.k65        main
 src/hud.k65         main

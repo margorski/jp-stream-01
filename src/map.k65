@@ -1,8 +1,8 @@
 // a - map tile
 inline check_if_key_or_doors {
-    a?60 == {gamestate_keys++}
+    a?[MAP_KEY_TILE] == {gamestate_keys++}
     else {
-        a?62 == {
+        a?[MAP_DOORS_TL_TILE] == {
             ptr_doors=a=x
             temp1=a=1
         }
@@ -32,10 +32,10 @@ inline map__update_door {
         y=0
         a=(ptr_doors),y == {
             // enable doors        
-            (ptr_doors),y=a=62 y++
-            (ptr_doors),y=a=63 y=40
-            (ptr_doors),y=a=94 y++ 
-            (ptr_doors),y=a=95
+            (ptr_doors),y=a=[MAP_DOORS_TL_TILE] y++
+            (ptr_doors),y=a=[MAP_DOORS_TR_TILE] y=40
+            (ptr_doors),y=a=[MAP_DOORS_BL_TILE] y++ 
+            (ptr_doors),y=a=[MAP_DOORS_BR_TILE]
         }
         else {
             // disable doors
